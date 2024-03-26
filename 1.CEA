@@ -1,0 +1,67 @@
+{ Game   : DARK SOULS II
+  Version: 
+  Date   : 2024-03-25
+  Author : Mihailo
+
+  This script does infinite health
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,DarkSoulsII.exe,89 8E FC 00 00 00 8B 02) // should be unique
+alloc(newmem,$1000)
+label(cheat)
+label(code)
+label(return)
+
+newmem:
+cheat:
+  cmp [esi+000000F78],1
+  jne code
+  mov [esi+000000FC], 700
+  jmp return
+code:
+  mov [esi+000000FC],ecx
+  jmp return
+
+INJECT:
+  jmp cheat
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 8E FC 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: DarkSoulsII.exe+1BB521
+
+DarkSoulsII.exe+1BB503: 3B C1                 - cmp eax,ecx
+DarkSoulsII.exe+1BB505: 7D 04                 - jnl DarkSoulsII.exe+1BB50B
+DarkSoulsII.exe+1BB507: 8B C7                 - mov eax,edi
+DarkSoulsII.exe+1BB509: EB 11                 - jmp DarkSoulsII.exe+1BB51C
+DarkSoulsII.exe+1BB50B: 3B 86 04 01 00 00     - cmp eax,[esi+00000104]
+DarkSoulsII.exe+1BB511: 8D 86 04 01 00 00     - lea eax,[esi+00000104]
+DarkSoulsII.exe+1BB517: 7F 03                 - jg DarkSoulsII.exe+1BB51C
+DarkSoulsII.exe+1BB519: 8D 45 08              - lea eax,[ebp+08]
+DarkSoulsII.exe+1BB51C: 8B 08                 - mov ecx,[eax]
+DarkSoulsII.exe+1BB51E: 8B 55 FC              - mov edx,[ebp-04]
+// ---------- INJECTING HERE ----------
+DarkSoulsII.exe+1BB521: 89 8E FC 00 00 00     - mov [esi+000000FC],ecx
+// ---------- DONE INJECTING  ----------
+DarkSoulsII.exe+1BB527: 8B 02                 - mov eax,[edx]
+DarkSoulsII.exe+1BB529: 50                    - push eax
+DarkSoulsII.exe+1BB52A: E8 C1 28 00 00        - call DarkSoulsII.exe+1BDDF0
+DarkSoulsII.exe+1BB52F: 83 C4 04              - add esp,04
+DarkSoulsII.exe+1BB532: 84 C0                 - test al,al
+DarkSoulsII.exe+1BB534: 74 2F                 - je DarkSoulsII.exe+1BB565
+DarkSoulsII.exe+1BB536: 83 BE FC 00 00 00 00  - cmp dword ptr [esi+000000FC],00
+DarkSoulsII.exe+1BB53D: 7F 26                 - jg DarkSoulsII.exe+1BB565
+DarkSoulsII.exe+1BB53F: 83 3F 01              - cmp dword ptr [edi],01
+DarkSoulsII.exe+1BB542: C7 45 08 01 00 00 00  - mov [ebp+08],00000001
+}
